@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, MapPin, Loader2 } from 'lucide-react';
+import { AlertTriangle, MapPin, Loader2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Geolocation } from '@capacitor/geolocation';
 
@@ -10,12 +10,30 @@ interface EmergencyButtonProps {
 
 export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isRequested, setIsRequested] = useState(false);
   const { toast } = useToast();
 
   // Debug function to check if button is working
   const handleButtonClick = () => {
-    console.log('Emergency button clicked!');
-    handleEmergencyPress();
+    console.log('Emergency button clicked! Current state:', { isLoading, isRequested });
+    
+    if (isRequested) {
+      // Reset the emergency state
+      handleResetEmergency();
+    } else {
+      // Trigger emergency
+      handleEmergencyPress();
+    }
+  };
+
+  const handleResetEmergency = () => {
+    setIsRequested(false);
+    toast({
+      title: "Emergency Request Cancelled",
+      description: "Emergency status has been reset. You can request help again if needed.",
+      duration: 3000,
+    });
+    console.log('Emergency state reset');
   };
 
   const getLocationFallback = (): Promise<{ lat: number; lng: number }> => {
@@ -99,10 +117,13 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
       // Trigger the emergency with location
       onEmergencyTriggered(location);
       
+      // Set button to requested state
+      setIsRequested(true);
+      
       // Show success message with coordinates
       toast({
         title: "✅ Emergency Alert Sent Successfully!",
-        description: `Your emergency contacts have been notified. Location: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}. Help is on the way!`,
+        description: `Your emergency contacts have been notified. Location: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}. Help is on the way! Press the button again to cancel the request.`,
         duration: 8000,
       });
       
@@ -113,9 +134,12 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
       const fallbackLocation = { lat: 0, lng: 0 };
       onEmergencyTriggered(fallbackLocation);
       
+      // Set button to requested state even with location error
+      setIsRequested(true);
+      
       toast({
         title: "⚠️ Emergency Alert Sent",
-        description: `Alert sent to your emergency contacts. Could not get precise location: ${error instanceof Error ? error.message : 'Unknown error'}. Help is being notified!`,
+        description: `Alert sent to your emergency contacts. Could not get precise location: ${error instanceof Error ? error.message : 'Unknown error'}. Help is being notified! Press the button again to cancel the request.`,
         variant: "destructive",
         duration: 8000,
       });
@@ -124,21 +148,46 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
     }
   };
 
+  // Determine button appearance based on state
+  const getButtonVariant = () => {
+    if (isRequested) return "default"; // Green success state
+    return "emergency"; // Red emergency state
+  };
+
+  const getButtonClassName = () => {
+    const baseClasses = "transition-all duration-300 shadow-floating cursor-pointer relative z-10";
+    
+    if (isLoading) {
+      return `${baseClasses} animate-emergency-pulse`;
+    }
+    
+    if (isRequested) {
+      return `${baseClasses} bg-green-500 hover:bg-green-600 text-white border-green-500 hover:scale-105 shadow-green-500/30`;
+    }
+    
+    return `${baseClasses} hover:scale-110`;
+  };
+
   return (
     <div className="flex flex-col items-center space-y-6">
       <div className="relative">
         <Button
-          variant="emergency"
+          variant={getButtonVariant()}
           size="emergency"
           onClick={handleButtonClick}
           disabled={isLoading}
-          className={`${isLoading ? "animate-emergency-pulse" : "hover:scale-110"} transition-all duration-300 shadow-floating cursor-pointer`}
+          className={getButtonClassName()}
           type="button"
         >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center">
               <Loader2 className="h-8 w-8 mb-1 animate-spin" />
               <span className="text-sm font-bold tracking-wider">SENDING...</span>
+            </div>
+          ) : isRequested ? (
+            <div className="flex flex-col items-center justify-center">
+              <CheckCircle className="h-8 w-8 mb-1" />
+              <span className="text-sm font-bold tracking-wider">REQUESTED</span>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center">
@@ -148,21 +197,40 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
           )}
         </Button>
         
-        {/* Pulse ring animation when not loading */}
+        {/* Pulse ring animation - different colors based on state */}
         {!isLoading && (
-          <div className="absolute inset-0 rounded-full border-4 border-emergency/30 animate-ping"></div>
+          <div className={`absolute inset-0 rounded-full border-4 animate-ping ${
+            isRequested 
+              ? "border-green-500/30" 
+              : "border-emergency/30"
+          }`}></div>
         )}
       </div>
       
       <div className="text-center space-y-3 max-w-sm">
-        <h2 className="text-2xl font-bold text-foreground">Emergency Alert</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          {isRequested ? "Emergency Requested" : "Emergency Alert"}
+        </h2>
         <p className="text-base text-muted-foreground leading-relaxed">
-          Press to instantly notify your emergency contacts with your exact location
+          {isRequested 
+            ? "Your emergency request is active. Press the button again to cancel the request."
+            : "Press to instantly notify your emergency contacts with your exact location"
+          }
         </p>
         <div className="flex items-center justify-center gap-2 text-sm text-primary bg-primary/10 px-4 py-2 rounded-full">
           <MapPin className="h-4 w-4" />
-          <span className="font-medium">GPS Location Enabled</span>
+          <span className="font-medium">
+            {isRequested ? "Location Shared" : "GPS Location Enabled"}
+          </span>
         </div>
+        
+        {/* Status indicator */}
+        {isRequested && (
+          <div className="flex items-center justify-center gap-2 text-sm text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+            <CheckCircle className="h-4 w-4" />
+            <span className="font-medium">Help is on the way</span>
+          </div>
+        )}
       </div>
     </div>
   );
