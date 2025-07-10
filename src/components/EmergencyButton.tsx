@@ -6,9 +6,10 @@ import { Geolocation } from '@capacitor/geolocation';
 
 interface EmergencyButtonProps {
   onEmergencyTriggered: (location: { lat: number; lng: number }) => void;
+  onEmergencyReset?: () => void;
 }
 
-export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) => {
+export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset }: EmergencyButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
   const { toast } = useToast();
@@ -28,6 +29,7 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
 
   const handleResetEmergency = () => {
     setIsRequested(false);
+    onEmergencyReset?.(); // Call the reset callback
     toast({
       title: "Emergency Request Cancelled",
       description: "Emergency status has been reset. You can request help again if needed.",

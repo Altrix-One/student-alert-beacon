@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Shield, AlertTriangle, Settings, Download, Smartphone } from 'lucide-react';
+import { Shield, AlertTriangle, Settings, Download, Smartphone, CheckCircle, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
 
@@ -16,6 +16,9 @@ const Index = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
+  const [emergencyStatus, setEmergencyStatus] = useState<'ready' | 'active' | 'setup-required'>('setup-required');
+  const [lastEmergencyTime, setLastEmergencyTime] = useState<Date | null>(null);
+  const [emergencyLocation, setEmergencyLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { toast } = useToast();
   const { isInstallable, isInstalled, installApp } = usePWA();
 
@@ -31,8 +34,28 @@ const Index = () => {
   useEffect(() => {
     // Save contacts to localStorage
     localStorage.setItem('emergency-contacts', JSON.stringify(contacts));
+    
+    // Update emergency status based on contacts
+    if (contacts.length > 0) {
+      setEmergencyStatus(emergencyStatus === 'active' ? 'active' : 'ready');
+    } else {
+      setEmergencyStatus('setup-required');
+    }
   }, [contacts]);
 
+  // Update emergency status when emergency is triggered
+  const updateEmergencyStatus = (location: { lat: number; lng: number }) => {
+    setEmergencyStatus('active');
+    setLastEmergencyTime(new Date());
+    setEmergencyLocation(location);
+  };
+
+  // Reset emergency status
+  const resetEmergencyStatus = () => {
+    setEmergencyStatus(contacts.length > 0 ? 'ready' : 'setup-required');
+    setLastEmergencyTime(null);
+    setEmergencyLocation(null);
+  };
   const handleEmergencyTriggered = async (location: { lat: number; lng: number }) => {
     console.log('handleEmergencyTriggered called with:', location);
     
@@ -46,6 +69,9 @@ const Index = () => {
       setIsSettingsOpen(true);
       return;
     }
+
+    // Update emergency status
+    updateEmergencyStatus(location);
 
     console.log('Processing emergency with contacts:', contacts);
     
@@ -86,6 +112,47 @@ const Index = () => {
     localStorage.setItem('emergency-history', JSON.stringify(emergencyHistory.slice(-10))); // Keep last 10 events
   };
 
+  // Get status display information
+  const getStatusInfo = () => {
+    switch (emergencyStatus) {
+      case 'active':
+        return {
+          icon: CheckCircle,
+          title: 'Emergency Active',
+          description: `${contacts.length} contact${contacts.length === 1 ? '' : 's'} notified`,
+          badge: 'Emergency Active',
+          badgeVariant: 'destructive' as const,
+          iconColor: 'text-red-500',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200'
+        };
+      case 'ready':
+        return {
+          icon: Shield,
+          title: 'Emergency Ready',
+          description: `${contacts.length} contact${contacts.length === 1 ? '' : 's'} configured`,
+          badge: 'Ready',
+          badgeVariant: 'default' as const,
+          iconColor: 'text-green-500',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-200'
+        };
+      default:
+        return {
+          icon: AlertTriangle,
+          title: 'Setup Required',
+          description: 'Add emergency contacts to get started',
+          badge: 'Setup Required',
+          badgeVariant: 'secondary' as const,
+          iconColor: 'text-orange-500',
+          bgColor: 'bg-orange-50',
+          borderColor: 'border-orange-200'
+        };
+    }
+  };
+
+  const statusInfo = getStatusInfo();
+
   // Debug: Log when contacts change
   useEffect(() => {
     console.log('Contacts updated:', contacts);
@@ -121,36 +188,67 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8 max-w-md space-y-8">
         {/* Emergency Status Card */}
-        <Card className="shadow-card border-primary/20 bg-gradient-card backdrop-blur-sm">
+        <Card className={`shadow-card backdrop-blur-sm transition-all duration-300 ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-primary" />
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+                  emergencyStatus === 'active' ? 'bg-red-100' : 
+                  emergencyStatus === 'ready' ? 'bg-green-100' : 'bg-orange-100'
+                }`}>
+                  <statusInfo.icon className={`h-6 w-6 ${statusInfo.iconColor}`} />
                 </div>
-                <CardTitle className="text-lg">Emergency Status</CardTitle>
+                <CardTitle className="text-lg">{statusInfo.title}</CardTitle>
               </div>
               <Badge 
-                variant={contacts.length > 0 ? "default" : "secondary"}
-                className={contacts.length > 0 ? "bg-green-500 hover:bg-green-600" : ""}
+                variant={statusInfo.badgeVariant}
+                className={emergencyStatus === 'active' ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" : 
+                          emergencyStatus === 'ready' ? "bg-green-500 hover:bg-green-600 text-white" : ""}
               >
-                {contacts.length > 0 ? "Ready" : "Setup Required"}
+                {statusInfo.badge}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <CardDescription className="text-base">
-              {contacts.length > 0 
-                ? `${contacts.length} emergency contact${contacts.length === 1 ? '' : 's'} configured`
-                : "Add emergency contacts to get started"
-              }
+            <CardDescription className="text-base mb-3">
+              {statusInfo.description}
             </CardDescription>
+            
+            {/* Additional status information */}
+            {emergencyStatus === 'active' && lastEmergencyTime && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-red-600">
+                  <Clock className="h-4 w-4" />
+                  <span>Alert sent at {lastEmergencyTime.toLocaleTimeString()}</span>
+                </div>
+                {emergencyLocation && emergencyLocation.lat !== 0 && (
+                  <div className="flex items-center gap-2 text-sm text-red-600">
+                    <Shield className="h-4 w-4" />
+                    <span>Location: {emergencyLocation.lat.toFixed(4)}, {emergencyLocation.lng.toFixed(4)}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-sm text-red-600">
+                  <Users className="h-4 w-4" />
+                  <span>Emergency contacts notified</span>
+                </div>
+              </div>
+            )}
+            
+            {emergencyStatus === 'ready' && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <CheckCircle className="h-4 w-4" />
+                <span>Ready to send emergency alerts</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Main Emergency Button */}
         <div className="flex justify-center py-6">
-          <EmergencyButton onEmergencyTriggered={handleEmergencyTriggered} />
+          <EmergencyButton 
+            onEmergencyTriggered={handleEmergencyTriggered}
+            onEmergencyReset={resetEmergencyStatus}
+          />
         </div>
 
         {/* Quick Actions */}
