@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Shield, AlertTriangle, Settings, Download, Smartphone, CheckCircle, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
+import type { StudentResidence } from '@/components/StudentResidence';
 
 const Index = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
@@ -78,7 +79,6 @@ const Index = () => {
     setLastEmergencyTime(null);
     setEmergencyLocation(null);
   };
-  const handleEmergencyTriggered = async (location: { lat: number; lng: number }) => {
   const handleEmergencyTriggered = async (location: { lat: number; lng: number; address?: string }) => {
     console.log('handleEmergencyTriggered called with:', location);
     

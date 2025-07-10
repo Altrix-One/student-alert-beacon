@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Home, MapPin, Edit, AlertTriangle, Navigation } from 'lucide-react';
-import { StudentResidence } from './StudentResidence';
+import type { StudentResidence } from './StudentResidence';
 
 interface ResidenceDashboardCardProps {
   residence: StudentResidence | null;
