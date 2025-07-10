@@ -61,7 +61,10 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
         {isLoading ? (
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
         ) : (
-          <AlertTriangle className="h-12 w-12" />
+          <div className="flex flex-col items-center justify-center">
+            <AlertTriangle className="h-8 w-8 mb-1" />
+            <span className="text-sm font-bold tracking-wider">EMERGENCY</span>
+          </div>
         )}
       </Button>
       
