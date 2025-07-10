@@ -112,12 +112,19 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-emergency': 'var(--gradient-emergency)',
-				'gradient-hero': 'var(--gradient-hero)'
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-card': 'var(--gradient-card)'
 			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
 				'emergency': 'var(--shadow-emergency)',
-				'glow': 'var(--shadow-glow)'
+				'glow': 'var(--shadow-glow)',
+				'card': 'var(--shadow-card)',
+				'floating': 'var(--shadow-floating)'
+			},
+			transitionTimingFunction: {
+				'spring': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+				'bounce': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
 			}
 		}
 	},

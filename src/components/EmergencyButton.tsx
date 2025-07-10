@@ -50,32 +50,39 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <Button
-        variant="emergency"
-        size="emergency"
-        onClick={handleEmergencyPress}
-        disabled={isLoading}
-        className={isLoading ? "animate-emergency-pulse" : "hover:scale-110"}
-      >
-        {isLoading ? (
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-        ) : (
-          <div className="flex flex-col items-center justify-center">
-            <AlertTriangle className="h-8 w-8 mb-1" />
-            <span className="text-sm font-bold tracking-wider">EMERGENCY</span>
-          </div>
+    <div className="flex flex-col items-center space-y-6">
+      <div className="relative">
+        <Button
+          variant="emergency"
+          size="emergency"
+          onClick={handleEmergencyPress}
+          disabled={isLoading}
+          className={`${isLoading ? "animate-emergency-pulse" : "hover:scale-110"} transition-all duration-300 shadow-floating`}
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              <AlertTriangle className="h-8 w-8 mb-1" />
+              <span className="text-sm font-bold tracking-wider">EMERGENCY</span>
+            </div>
+          )}
+        </Button>
+        
+        {/* Pulse ring animation when not loading */}
+        {!isLoading && (
+          <div className="absolute inset-0 rounded-full border-4 border-emergency/30 animate-ping"></div>
         )}
-      </Button>
+      </div>
       
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-foreground">Emergency Button</h2>
-        <p className="text-sm text-muted-foreground max-w-xs">
-          Press and hold to send an emergency alert with your location to your emergency contacts
+      <div className="text-center space-y-3 max-w-sm">
+        <h2 className="text-2xl font-bold text-foreground">Emergency Alert</h2>
+        <p className="text-base text-muted-foreground leading-relaxed">
+          Press to instantly notify your emergency contacts with your exact location
         </p>
-        <div className="flex items-center justify-center gap-1 text-xs text-primary">
-          <MapPin className="h-3 w-3" />
-          <span>Location tracking enabled</span>
+        <div className="flex items-center justify-center gap-2 text-sm text-primary bg-primary/10 px-4 py-2 rounded-full">
+          <MapPin className="h-4 w-4" />
+          <span className="font-medium">GPS Location Enabled</span>
         </div>
       </div>
     </div>

@@ -8,14 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Shield, AlertTriangle, Settings } from 'lucide-react';
+import { Shield, AlertTriangle, Settings, Download, Smartphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePWA } from '@/hooks/usePWA';
 
 const Index = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
   const { toast } = useToast();
+  const { isInstallable, isInstalled, installApp } = usePWA();
 
   useEffect(() => {
     // Load contacts from localStorage
@@ -55,24 +57,53 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-hero">
       <AppHeader onOpenSettings={() => setIsSettingsOpen(true)} />
       
-      <main className="container mx-auto px-4 py-8 max-w-md">
-        {/* Emergency Status */}
-        <Card className="mb-6 shadow-soft border-primary/20">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <CardTitle className="text-base">Emergency Status</CardTitle>
+      {/* PWA Install Banner */}
+      {isInstallable && !isInstalled && (
+        <div className="bg-gradient-primary p-4 text-white">
+          <div className="container mx-auto max-w-md flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Smartphone className="h-6 w-6" />
+              <div>
+                <p className="font-semibold text-sm">Install SafeCampus</p>
+                <p className="text-xs opacity-90">Add to home screen for quick access</p>
               </div>
-              <Badge variant={contacts.length > 0 ? "default" : "secondary"}>
+            </div>
+            <Button
+              onClick={installApp}
+              size="sm"
+              variant="glass"
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Install
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      <main className="container mx-auto px-6 py-8 max-w-md space-y-8">
+        {/* Emergency Status Card */}
+        <Card className="shadow-card border-primary/20 bg-gradient-card backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle className="text-lg">Emergency Status</CardTitle>
+              </div>
+              <Badge 
+                variant={contacts.length > 0 ? "default" : "secondary"}
+                className={contacts.length > 0 ? "bg-green-500 hover:bg-green-600" : ""}
+              >
                 {contacts.length > 0 ? "Ready" : "Setup Required"}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <CardDescription>
+            <CardDescription className="text-base">
               {contacts.length > 0 
-                ? `${contacts.length} emergency contacts configured`
+                ? `${contacts.length} emergency contact${contacts.length === 1 ? '' : 's'} configured`
                 : "Add emergency contacts to get started"
               }
             </CardDescription>
@@ -80,7 +111,7 @@ const Index = () => {
         </Card>
 
         {/* Main Emergency Button */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center py-6">
           <EmergencyButton onEmergencyTriggered={handleEmergencyTriggered} />
         </div>
 
@@ -89,23 +120,26 @@ const Index = () => {
 
         {/* First Time Setup */}
         {isFirstTime && contacts.length === 0 && (
-          <Card className="mt-6 shadow-soft border-accent/20 bg-accent/5">
+          <Card className="shadow-card border-accent/20 bg-gradient-card backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-accent">
-                <AlertTriangle className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-3 text-accent">
+                <div className="h-10 w-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6" />
+                </div>
                 Setup Required
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="mb-4">
+              <CardDescription className="mb-6 text-base leading-relaxed">
                 Add your emergency contacts to start using SafeCampus. Your contacts will receive alerts with your location during emergencies.
               </CardDescription>
               <Button 
                 onClick={() => setIsSettingsOpen(true)}
                 variant="hero"
-                className="w-full gap-2"
+                size="lg"
+                className="w-full gap-3"
               >
-                <Settings className="h-4 w-4" />
+                <Settings className="h-5 w-5" />
                 Setup Emergency Contacts
               </Button>
             </CardContent>

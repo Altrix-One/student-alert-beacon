@@ -1,0 +1,43 @@
+{
+  "name": "SafeCampus - University Emergency App",
+  "short_name": "SafeCampus",
+  "description": "Emergency safety app for university students with location tracking and emergency contacts",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["safety", "utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency Alert",
+      "short_name": "Emergency",
+      "description": "Send emergency alert immediately",
+      "url": "/?action=emergency",
+      "icons": [
+        {
+          "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
