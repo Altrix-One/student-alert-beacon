@@ -65,6 +65,8 @@ export const EmergencyContacts = ({ contacts, onContactsChange }: EmergencyConta
     });
     setIsAdding(false);
     
+    console.log('Contact added successfully:', contact);
+    
     toast({
       title: "Contact Added",
       description: `${contact.name} has been added to your emergency contacts.`,

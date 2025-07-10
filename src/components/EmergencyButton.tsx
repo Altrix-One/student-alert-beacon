@@ -12,6 +12,12 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Debug function to check if button is working
+  const handleButtonClick = () => {
+    console.log('Emergency button clicked!');
+    handleEmergencyPress();
+  };
+
   const getLocationFallback = (): Promise<{ lat: number; lng: number }> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -124,9 +130,10 @@ export const EmergencyButton = ({ onEmergencyTriggered }: EmergencyButtonProps) 
         <Button
           variant="emergency"
           size="emergency"
-          onClick={handleEmergencyPress}
+          onClick={handleButtonClick}
           disabled={isLoading}
-          className={`${isLoading ? "animate-emergency-pulse" : "hover:scale-110"} transition-all duration-300 shadow-floating`}
+          className={`${isLoading ? "animate-emergency-pulse" : "hover:scale-110"} transition-all duration-300 shadow-floating cursor-pointer`}
+          type="button"
         >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center">

@@ -34,7 +34,10 @@ const Index = () => {
   }, [contacts]);
 
   const handleEmergencyTriggered = async (location: { lat: number; lng: number }) => {
+    console.log('handleEmergencyTriggered called with:', location);
+    
     if (contacts.length === 0) {
+      console.log('No emergency contacts found');
       toast({
         title: "No Emergency Contacts",
         description: "Please add emergency contacts in settings first.",
@@ -44,6 +47,8 @@ const Index = () => {
       return;
     }
 
+    console.log('Processing emergency with contacts:', contacts);
+    
     // Simulate sending emergency alerts to all contacts
     console.log('Emergency triggered!', { 
       location, 
@@ -80,6 +85,11 @@ const Index = () => {
     emergencyHistory.push(emergencyEvent);
     localStorage.setItem('emergency-history', JSON.stringify(emergencyHistory.slice(-10))); // Keep last 10 events
   };
+
+  // Debug: Log when contacts change
+  useEffect(() => {
+    console.log('Contacts updated:', contacts);
+  }, [contacts]);
 
   return (
     <div className="min-h-screen bg-gradient-hero">
