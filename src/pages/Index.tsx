@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { EmergencyButton } from '@/components/EmergencyButton';
 import { EmergencyContacts, EmergencyContact } from '@/components/EmergencyContacts';
+import { StudentResidence } from '@/components/StudentResidence';
+import { ResidenceDashboardCard } from '@/components/ResidenceDashboardCard';
 import { QuickActions } from '@/components/QuickActions';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +16,7 @@ import { usePWA } from '@/hooks/usePWA';
 
 const Index = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+  const [residence, setResidence] = useState<StudentResidence | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
   const [emergencyStatus, setEmergencyStatus] = useState<'ready' | 'active' | 'setup-required'>('setup-required');
@@ -29,6 +32,16 @@ const Index = () => {
       setContacts(JSON.parse(savedContacts));
       setIsFirstTime(false);
     }
+    
+    // Load residence from localStorage
+    const savedResidence = localStorage.getItem('student-residence');
+    if (savedResidence) {
+      const residenceData = JSON.parse(savedResidence);
+      // Convert date strings back to Date objects
+      residenceData.createdAt = new Date(residenceData.createdAt);
+      residenceData.updatedAt = new Date(residenceData.updatedAt);
+      setResidence(residenceData);
+    }
   }, []);
 
   useEffect(() => {
@@ -42,6 +55,15 @@ const Index = () => {
       setEmergencyStatus('setup-required');
     }
   }, [contacts]);
+
+  useEffect(() => {
+    // Save residence to localStorage
+    if (residence) {
+      localStorage.setItem('student-residence', JSON.stringify(residence));
+    } else {
+      localStorage.removeItem('student-residence');
+    }
+  }, [residence]);
 
   // Update emergency status when emergency is triggered
   const updateEmergencyStatus = (location: { lat: number; lng: number }) => {
@@ -57,6 +79,7 @@ const Index = () => {
     setEmergencyLocation(null);
   };
   const handleEmergencyTriggered = async (location: { lat: number; lng: number }) => {
+  const handleEmergencyTriggered = async (location: { lat: number; lng: number; address?: string }) => {
     console.log('handleEmergencyTriggered called with:', location);
     
     if (contacts.length === 0) {
@@ -76,17 +99,25 @@ const Index = () => {
     console.log('Processing emergency with contacts:', contacts);
     
     // Simulate sending emergency alerts to all contacts
+    const locationInfo = location.address 
+      ? `${location.address} (${location.lat}, ${location.lng})`
+      : `coordinates ${location.lat}, ${location.lng}`;
+      
     console.log('Emergency triggered!', { 
       location, 
       contacts,
       timestamp: new Date().toISOString(),
-      message: `EMERGENCY ALERT: Help needed at coordinates ${location.lat}, ${location.lng}`
+      message: `EMERGENCY ALERT: Help needed at ${locationInfo}`
     });
     
     // Show detailed success message
+    const successLocationText = location.address 
+      ? `${location.address} (${location.lat.toFixed(6)}, ${location.lng.toFixed(6)})`
+      : `coordinates (${location.lat.toFixed(6)}, ${location.lng.toFixed(6)})`;
+      
     toast({
       title: "🚨 EMERGENCY RESPONSE ACTIVATED",
-      description: `Alert successfully sent to ${contacts.length} emergency contact${contacts.length === 1 ? '' : 's'}. Your exact coordinates (${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}) have been shared. Emergency services and your contacts have been notified. Stay calm - help is on the way!`,
+      description: `Alert successfully sent to ${contacts.length} emergency contact${contacts.length === 1 ? '' : 's'}. Your location ${successLocationText} has been shared. Emergency services and your contacts have been notified. Stay calm - help is on the way!`,
       duration: 10000,
     });
 
@@ -248,11 +279,18 @@ const Index = () => {
           <EmergencyButton 
             onEmergencyTriggered={handleEmergencyTriggered}
             onEmergencyReset={resetEmergencyStatus}
+            residence={residence}
           />
         </div>
 
         {/* Quick Actions */}
         <QuickActions />
+
+        {/* Student Residence Card */}
+        <ResidenceDashboardCard 
+          residence={residence}
+          onEditClick={() => setIsSettingsOpen(true)}
+        />
 
         {/* First Time Setup */}
         {isFirstTime && contacts.length === 0 && (
@@ -294,8 +332,9 @@ const Index = () => {
           </DialogHeader>
           
           <Tabs defaultValue="contacts" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="contacts">Emergency Contacts</TabsTrigger>
+              <TabsTrigger value="residence">Residence</TabsTrigger>
               <TabsTrigger value="settings">App Settings</TabsTrigger>
             </TabsList>
             
@@ -303,6 +342,13 @@ const Index = () => {
               <EmergencyContacts 
                 contacts={contacts}
                 onContactsChange={setContacts}
+              />
+            </TabsContent>
+            
+            <TabsContent value="residence" className="mt-4">
+              <StudentResidence 
+                residence={residence}
+                onResidenceChange={setResidence}
               />
             </TabsContent>
             

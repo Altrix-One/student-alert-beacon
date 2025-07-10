@@ -4,12 +4,19 @@ import { AlertTriangle, MapPin, Loader2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Geolocation } from '@capacitor/geolocation';
 
-interface EmergencyButtonProps {
-  onEmergencyTriggered: (location: { lat: number; lng: number }) => void;
-  onEmergencyReset?: () => void;
+interface EmergencyLocation {
+  lat: number;
+  lng: number;
+  address?: string;
 }
 
-export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset }: EmergencyButtonProps) => {
+interface EmergencyButtonProps {
+  onEmergencyTriggered: (location: EmergencyLocation) => void;
+  onEmergencyReset?: () => void;
+  residence?: any; // StudentResidence type
+}
+
+export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset, residence }: EmergencyButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
   const { toast } = useToast();
@@ -116,16 +123,26 @@ export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset }: Emer
       // Get current location with improved error handling
       const location = await getCurrentLocation();
       
+      // Enhance location with residence information if available
+      const enhancedLocation: EmergencyLocation = {
+        ...location,
+        address: residence ? `${residence.residenceName}, ${residence.streetAddress}${residence.unitRoomNumber ? `, ${residence.unitRoomNumber}` : ''}, ${residence.city}, ${residence.stateProvince}` : undefined
+      };
+      
       // Trigger the emergency with location
-      onEmergencyTriggered(location);
+      onEmergencyTriggered(enhancedLocation);
       
       // Set button to requested state
       setIsRequested(true);
       
       // Show success message with coordinates
+      const locationText = residence 
+        ? `${residence.residenceName} (${location.lat.toFixed(6)}, ${location.lng.toFixed(6)})`
+        : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+        
       toast({
         title: "✅ Emergency Alert Sent Successfully!",
-        description: `Your emergency contacts have been notified. Location: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}. Help is on the way! Press the button again to cancel the request.`,
+        description: `Your emergency contacts have been notified. Location: ${locationText}. Help is on the way! Press the button again to cancel the request.`,
         duration: 8000,
       });
       
@@ -133,15 +150,23 @@ export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset }: Emer
       console.error('Error getting location:', error);
       
       // Still send emergency alert without precise location
-      const fallbackLocation = { lat: 0, lng: 0 };
+      const fallbackLocation: EmergencyLocation = { 
+        lat: 0, 
+        lng: 0,
+        address: residence ? `${residence.residenceName}, ${residence.streetAddress}${residence.unitRoomNumber ? `, ${residence.unitRoomNumber}` : ''}, ${residence.city}, ${residence.stateProvince}` : undefined
+      };
       onEmergencyTriggered(fallbackLocation);
       
       // Set button to requested state even with location error
       setIsRequested(true);
       
+      const fallbackLocationText = residence 
+        ? `${residence.residenceName} (GPS unavailable)`
+        : 'GPS unavailable';
+        
       toast({
         title: "⚠️ Emergency Alert Sent",
-        description: `Alert sent to your emergency contacts. Could not get precise location: ${error instanceof Error ? error.message : 'Unknown error'}. Help is being notified! Press the button again to cancel the request.`,
+        description: `Alert sent to your emergency contacts. Location: ${fallbackLocationText}. Could not get precise GPS: ${error instanceof Error ? error.message : 'Unknown error'}. Help is being notified! Press the button again to cancel the request.`,
         variant: "destructive",
         duration: 8000,
       });
@@ -222,7 +247,10 @@ export const EmergencyButton = ({ onEmergencyTriggered, onEmergencyReset }: Emer
         <div className="flex items-center justify-center gap-2 text-sm text-primary bg-primary/10 px-4 py-2 rounded-full">
           <MapPin className="h-4 w-4" />
           <span className="font-medium">
-            {isRequested ? "Location Shared" : "GPS Location Enabled"}
+            {isRequested 
+              ? (residence ? `${residence.residenceName} Shared` : "Location Shared")
+              : (residence ? `${residence.residenceName} Ready` : "GPS Location Enabled")
+            }
           </span>
         </div>
         
