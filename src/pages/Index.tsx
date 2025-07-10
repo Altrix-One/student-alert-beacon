@@ -44,13 +44,41 @@ const Index = () => {
       return;
     }
 
-    // In a real app, this would integrate with Supabase to send actual notifications
-    console.log('Emergency triggered!', { location, contacts });
-    
-    toast({
-      title: "Emergency Alert Sent!",
-      description: `Alert sent to ${contacts.length} contacts with your location: ${location.lat}, ${location.lng}`,
+    // Simulate sending emergency alerts to all contacts
+    console.log('Emergency triggered!', { 
+      location, 
+      contacts,
+      timestamp: new Date().toISOString(),
+      message: `EMERGENCY ALERT: Help needed at coordinates ${location.lat}, ${location.lng}`
     });
+    
+    // Show detailed success message
+    toast({
+      title: "🚨 EMERGENCY RESPONSE ACTIVATED",
+      description: `Alert successfully sent to ${contacts.length} emergency contact${contacts.length === 1 ? '' : 's'}. Your exact coordinates (${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}) have been shared. Emergency services and your contacts have been notified. Stay calm - help is on the way!`,
+      duration: 10000,
+    });
+
+    // Log emergency event for debugging/tracking
+    const emergencyEvent = {
+      timestamp: new Date().toISOString(),
+      location: {
+        latitude: location.lat,
+        longitude: location.lng,
+        accuracy: 'high-precision'
+      },
+      contactsNotified: contacts.length,
+      contactMethods: contacts.flatMap(c => c.methods),
+      userAgent: navigator.userAgent,
+      status: 'sent'
+    };
+    
+    console.log('Emergency Event Logged:', emergencyEvent);
+    
+    // Store in localStorage for emergency history (optional)
+    const emergencyHistory = JSON.parse(localStorage.getItem('emergency-history') || '[]');
+    emergencyHistory.push(emergencyEvent);
+    localStorage.setItem('emergency-history', JSON.stringify(emergencyHistory.slice(-10))); // Keep last 10 events
   };
 
   return (

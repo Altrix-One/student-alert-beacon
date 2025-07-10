@@ -15,6 +15,26 @@ export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    // Request location permissions on app load for better emergency response
+    const requestLocationPermission = async () => {
+      if ('geolocation' in navigator) {
+        try {
+          await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 300000
+            });
+          });
+          console.log('Location permission granted');
+        } catch (error) {
+          console.log('Location permission denied or unavailable:', error);
+        }
+      }
+    };
+
+    requestLocationPermission();
+
     // Register service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
