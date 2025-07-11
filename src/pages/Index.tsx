@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Shield, AlertTriangle, Settings, Download, Smartphone, CheckCircle, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { PWAStatus } from '@/components/PWAStatus';
 import type { StudentResidence } from '@/components/StudentResidence';
 
 const Index = () => {
@@ -193,29 +195,8 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-hero">
       <AppHeader onOpenSettings={() => setIsSettingsOpen(true)} />
       
-      {/* PWA Install Banner */}
-      {isInstallable && !isInstalled && (
-        <div className="bg-gradient-primary p-4 text-white">
-          <div className="container mx-auto max-w-md flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Smartphone className="h-6 w-6" />
-              <div>
-                <p className="font-semibold text-sm">Install SafeCampus</p>
-                <p className="text-xs opacity-90">Add to home screen for quick access</p>
-              </div>
-            </div>
-            <Button
-              onClick={installApp}
-              size="sm"
-              variant="glass"
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Install
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
       
       <main className="container mx-auto px-6 py-8 max-w-md space-y-8">
         {/* Emergency Status Card */}
@@ -353,37 +334,41 @@ const Index = () => {
             </TabsContent>
             
             <TabsContent value="settings" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Location Services</CardTitle>
-                  <CardDescription>
-                    Location access is required to send your exact position during emergencies.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="default" className="gap-1">
-                    <Shield className="h-3 w-3" />
-                    Location Enabled
-                  </Badge>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Location Services</CardTitle>
+                    <CardDescription>
+                      Location access is required to send your exact position during emergencies.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Badge variant="default" className="gap-1">
+                      <Shield className="h-3 w-3" />
+                      Location Enabled
+                    </Badge>
+                  </CardContent>
+                </Card>
               
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="text-base">Notification Methods</CardTitle>
-                  <CardDescription>
-                    Connect to Supabase for SMS, email, and WhatsApp notifications.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" disabled>
-                    Connect Backend Services
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Click the Supabase button at the top right to enable messaging features.
-                  </p>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Notification Methods</CardTitle>
+                    <CardDescription>
+                      Connect to Supabase for SMS, email, and WhatsApp notifications.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full" disabled>
+                      Connect Backend Services
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Click the Supabase button at the top right to enable messaging features.
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <PWAStatus />
+              </div>
             </TabsContent>
           </Tabs>
         </DialogContent>
