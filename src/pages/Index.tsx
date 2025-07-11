@@ -252,6 +252,21 @@ const Index = () => {
                 <span>Ready to send emergency alerts</span>
               </div>
             )}
+            
+            {/* Add Emergency Contact Button for Setup Required */}
+            {emergencyStatus === 'setup-required' && (
+              <div className="pt-3 border-t border-orange-200">
+                <Button
+                  onClick={() => setIsSettingsOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2 border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400"
+                >
+                  <Users className="h-4 w-4" />
+                  Add Emergency Contact
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
