@@ -13,61 +13,61 @@
   "categories": ["safety", "utilities", "lifestyle", "education"],
   "icons": [
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -81,7 +81,7 @@
       "url": "/?action=emergency",
       "icons": [
         {
-          "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+          "src": "/SafeCampus.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -94,7 +94,7 @@
       "url": "/?action=settings",
       "icons": [
         {
-          "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+          "src": "/SafeCampus.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -103,13 +103,13 @@
   ],
   "screenshots": [
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "540x720",
       "type": "image/png",
       "form_factor": "narrow"
     },
     {
-      "src": "/lovable-uploads/d3cad07d-531f-4c17-b4f7-419efa7716f0.png",
+      "src": "/SafeCampus.png",
       "sizes": "720x540",
       "type": "image/png",
       "form_factor": "wide"

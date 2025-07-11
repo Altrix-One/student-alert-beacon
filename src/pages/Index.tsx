@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { EmergencyButton } from '@/components/EmergencyButton';
 import { EmergencyContacts, EmergencyContact } from '@/components/EmergencyContacts';
-import { StudentResidence } from '@/components/StudentResidence';
+import { StudentResidence, type StudentResidence as StudentResidenceType } from '@/components/StudentResidence';
 import { ResidenceDashboardCard } from '@/components/ResidenceDashboardCard';
 import { QuickActions } from '@/components/QuickActions';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -15,11 +15,10 @@ import { useToast } from '@/hooks/use-toast';
 import { usePWA } from '@/hooks/usePWA';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { PWAStatus } from '@/components/PWAStatus';
-import type { StudentResidence } from '@/components/StudentResidence';
 
 const Index = () => {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [residence, setResidence] = useState<StudentResidence | null>(null);
+  const [residence, setResidence] = useState<StudentResidenceType | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
   const [emergencyStatus, setEmergencyStatus] = useState<'ready' | 'active' | 'setup-required'>('setup-required');
